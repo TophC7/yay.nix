@@ -15,7 +15,7 @@ function __yay_tar
         echo "  -v, --verbose       Enable verbose output"
         echo "  -h, --help        Show this help message"
         echo ""
-        echo "Supported compression types: :D"
+        echo "Supported compression types:"
         echo "  7zip   - .7z or .tar.7z (levels: 0-9, default 5, threads: yes)"
         echo "  bzip2  - .tar.bz2 (levels: 1-9, default 9)"
         echo "  bzip3  - .tar.bz3 (block size in MiB: 1-511, default 16, threads: yes)"

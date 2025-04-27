@@ -14,11 +14,11 @@ let
     cp ${../share/fish/completions}/yay.fish $out/share/fish/completions/
   '';
 
-  # Create main yay binary that ensures fish is available
+  # Create main yay binary that uses fish's function path
   yayBin = pkgs.writeShellScriptBin "yay" ''
-    exec ${pkgs.fish}/bin/fish -c "yay $*"
+    FUNCTIONS_DIR=$(dirname $(dirname $0))/share/fish/functions
+    exec ${lib.getExe pkgs.fish} -c "set fish_function_path \$fish_function_path $FUNCTIONS_DIR; source $FUNCTIONS_DIR/yay.fish; yay_function $@"
   '';
-
 in
 pkgs.symlinkJoin {
   name = "yay";
@@ -34,6 +34,7 @@ pkgs.symlinkJoin {
     wrapProgram $out/bin/yay \
       --prefix PATH : ${
         lib.makeBinPath [
+          pkgs.fish
           pkgs.nh
           pkgs.jq
           pkgs.gzip
