@@ -45,6 +45,17 @@ Add to your flake.nix:
 }
 ```
 
+### Try in shell
+
+```bash
+#create shell with yay
+nix shell github:Tophc7/yay.nix
+
+## run any yay command
+yay try fastfetch
+yay garbage
+```
+
 ## Commands
 
 ### rebuild
