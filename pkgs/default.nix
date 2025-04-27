@@ -14,10 +14,26 @@ let
     cp ${../share/fish/completions}/yay.fish $out/share/fish/completions/
   '';
 
-  # Create main yay binary that uses fish's function path
+  # Create main yay binary that correctly passes args to fish
   yayBin = pkgs.writeShellScriptBin "yay" ''
     FUNCTIONS_DIR=$(dirname $(dirname $0))/share/fish/functions
-    exec ${lib.getExe pkgs.fish} -c "set fish_function_path \$fish_function_path $FUNCTIONS_DIR; source $FUNCTIONS_DIR/yay.fish; yay_function $@"
+    
+    # Create a temporary script to handle command execution
+    TEMP_SCRIPT=$(mktemp -t yay-command.XXXXXX)
+    
+    # Write the fish commands to the script
+    cat > $TEMP_SCRIPT << EOF
+    #!/usr/bin/env fish
+    set fish_function_path \$fish_function_path $FUNCTIONS_DIR
+    source $FUNCTIONS_DIR/yay.fish
+    yay_function $@
+    EOF
+    
+    # Execute the script
+    ${lib.getExe pkgs.fish} $TEMP_SCRIPT "$@"
+    
+    # Clean up
+    rm $TEMP_SCRIPT
   '';
 in
 pkgs.symlinkJoin {

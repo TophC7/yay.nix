@@ -162,9 +162,15 @@ If theres a command you think would be useful to add let me know, I might agree.
 
 ## Technical Details
 
-Yay.nix is implemented as a collection of fish functions that are installed into your system's fish function path. The main `yay` command is a bash script that invokes fish with the correct environment to execute the functions.
+Yay.nix is implemented as a collection of fish functions that are installed into your system's fish function path. The main `yay` command is a bash script that:
 
-All commands and options have competitions making the tool easy to use interactively
+1. Creates a temporary fish script
+2. Sets up the fish function path to include the installed functions
+3. Sources the main yay.fish file 
+4. Passes all command-line arguments to the appropriate fish function
+5. Cleans up after execution
+
+All commands and options have completions making the tool easy to use interactively.
 
 ## License
 
