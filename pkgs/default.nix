@@ -10,8 +10,8 @@ let
 
   # Copy completions
   fishCompletions = pkgs.runCommand "yay-fish-completions" { } ''
-    mkdir -p $out/share/fish/completions
-    cp ${../share/fish/completions}/yay.fish $out/share/fish/completions/
+    mkdir -p $out/share/fish/vendor_completions.d
+    cp ${../share/fish/completions}/yay.fish $out/share/fish/vendor_completions.d/
   '';
 
   # Create main yay binary that correctly passes args to fish

@@ -20,9 +20,9 @@ function __yay_rebuild
     set orig (pwd)
     cd $flake_path
     if set -q _flag_trace
-        __yay_run "nh os switch . -- --impure --show-trace"
+        __yay_run "nh os switch .#$host -- --impure --show-trace"
     else
-        __yay_run "nh os switch . -- --impure"
+        __yay_run "nh os switch .#$host -- --impure"
     end
     cd $orig
 end
