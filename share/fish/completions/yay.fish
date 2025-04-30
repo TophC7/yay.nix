@@ -1,3 +1,27 @@
+function __ensure_yay_functions
+    # Only try to load if the function doesn't already exist
+    if not type -q __yay_get_flake_path
+        # Try to find and source the function files
+        set -l possible_paths \
+            (dirname (status -f))/../functions \
+            (dirname (dirname (status -f)))/functions \
+            /run/current-system/sw/share/yay.nix/functions \
+            $__fish_config_dir/functions
+            
+        for dir in $possible_paths
+            if test -f "$dir/__yay_get_flake_path.fish"
+                source "$dir/__yay_get_flake_path.fish"
+                # Also load color functions if needed
+                test -f "$dir/__yay_yellow.fish" && source "$dir/__yay_yellow.fish"
+                test -f "$dir/__yay_red.fish" && source "$dir/__yay_red.fish"
+                break
+            end
+        end
+    end
+end
+
+__ensure_yay_functions
+
 ######################
 # UTILITY FUNCTIONS  #
 ######################
@@ -70,6 +94,14 @@ function __yay_list_flake_inputs
 end
 
 function __yay_get_flake_inputs
+    # Ensure required functions are available
+    __ensure_yay_functions
+    
+    # Skip if the required function isn't available
+    if not type -q __yay_get_flake_path
+        return 1
+    end
+    
     set -l cmd (commandline -poc)
     set -l path ""
     
