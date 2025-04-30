@@ -52,7 +52,7 @@ Add to your flake.nix:
 nix shell github:Tophc7/yay.nix
 
 ## run any yay command
-yay try fastfetch
+yay try fastfetch -- fastfetch --config examples/24
 yay garbage
 ```
 
@@ -75,25 +75,33 @@ Options:
 
 ### update
 
-Update flake inputs.
+Update flake inputs. You can update all inputs or specify a single input to update.
 
 ```bash
-yay update [OPTIONS]
+yay update [OPTIONS] [INPUT]
 ```
 
 Options:
 - `-p, --path PATH`: Path to the Nix configuration (overrides FLAKE)
+- `-i, --input INPUT`: Name of the specific input to update (alternative to positional argument)
 - `-h, --help`: Show help message
 
+Examples:
+```bash
+# Update all inputs
+yay update
 
-TODO:
-- update specific inputs
-- autocomplete for those inputs
+# Update only the 'nixpkgs' input
+yay update nixpkgs
+
+# Update 'nixpkgs' using the flag
+yay update -i nixpkgs
+```
 
 ### garbage
 
 Clean up the Nix store and home-manager backups.
-Super overkill don't come for me if something goes wrong. Regardless I use it all the time. 
+Super overkill don't come for me if something goes wrong. Regardless I use it all the time.
 
 ```bash
 yay garbage
@@ -101,25 +109,29 @@ yay garbage
 
 This command:
 1. Cleans using `nh clean all` (with and without sudo)
-2. Runs `nix-collect-garbage --delete-old` (with and without sudo) 
+2. Runs `nix-collect-garbage --delete-old` (with and without sudo)
 3. Executes `nix-store --gc` (with and without sudo)
 4. Removes home-manager backup files
 
 ### try
 
-Create a shell with specified packages.
+Create a temporary shell with specified packages. You can either drop into an interactive shell or run a command directly within the environment using `--`.
 
 ```bash
-yay try PACKAGE [PACKAGE...]
+yay try PACKAGE [PACKAGE...] [-- COMMAND [ARGS...]]
 ```
 
-Example:
+Examples:
 ```bash
+# Enter an interactive shell with fastfetch and cowsay available
 yay try fastfetch cowsay
-```
 
-TODO:
-- allow `--` to run command directly  
+# Run 'fastfetch' directly using the packages in the temporary shell
+yay try fastfetch -- fastfetch
+
+# Run 'cowsay moo' directly using the cowsay package
+yay try cowsay -- cowsay moo
+```
 
 ### tar
 
@@ -154,7 +166,7 @@ yay untar [OPTIONS] ARCHIVE [OUTPUT_DIR]
 ```
 
 Options:
-- `-o, --output DIR`: Output directory 
+- `-o, --output DIR`: Output directory
 - `-v, --verbose`: Enable verbose output
 - `-h, --help`: Show help message
 
@@ -177,7 +189,7 @@ Yay.nix is implemented as a collection of fish functions that are installed into
 
 1. Creates a temporary fish script
 2. Sets up the fish function path to include the installed functions
-3. Sources the main yay.fish file 
+3. Sources the main yay.fish file
 4. Passes all command-line arguments to the appropriate fish function
 5. Cleans up after execution
 
