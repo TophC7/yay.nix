@@ -1,12 +1,13 @@
 function __yay_rebuild
-    set -l opts h/help 'p/path=' 'H/host=' t/trace
+    set -l opts h/help 'p/path=' 'H/host=' t/trace e/experimental
     argparse $opts -- $argv; or return
     if set -q _flag_help
         echo "Usage: yay rebuild [OPTIONS]"
-        echo "  -p, --path PATH   Path to the Nix configuration (overrides FLAKE)"
-        echo "  -H, --host HOST   Hostname to build for (default: current hostname)"
-        echo "  -t, --trace     Enable trace output"
-        echo "  -h, --help      Show this help message"
+        echo "  -h, --help          Show this help message"
+        echo "  -e, --experimental  Enable experimental features (flakes and nix-commands)"
+        echo "  -H, --host HOST     Hostname to build for (default: current hostname)"
+        echo "  -p, --path PATH     Path to the Nix configuration (overrides FLAKE)"
+        echo "  -t, --trace         Enable trace output"
         return
     end
     set flake_path (__yay_get_flake_path $_flag_path); or return
@@ -19,10 +20,22 @@ function __yay_rebuild
     __yay_green "««« REBUILDING NIXOS ($host) »»»"
     set orig (pwd)
     cd $flake_path
+
+    # Base command
+    set -l cmd "nh os switch . -H $host -- --impure"
+
+    # Add trace if requested
     if set -q _flag_trace
-        __yay_run "nh os switch . -H $host -- --impure --show-trace"
-    else
-        __yay_run "nh os switch . -H $host -- --impure"
+        set cmd "$cmd --show-trace"
     end
+
+    # Add experimental features if requested
+    if set -q _flag_experimental
+        set cmd "$cmd --extra-experimental-features flakes --extra-experimental-features nix-commands"
+    end
+
+    # Run the command
+    __yay_run $cmd
+
     cd $orig
 end

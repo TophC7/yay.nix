@@ -17,10 +17,10 @@ let
   # Create main yay binary that correctly passes args to fish
   yayBin = pkgs.writeShellScriptBin "yay" ''
     FUNCTIONS_DIR=$(dirname $(dirname $0))/share/fish/functions
-    
+
     # Create a temporary script to handle command execution
     TEMP_SCRIPT=$(mktemp -t yay-command.XXXXXX)
-    
+
     # Write the fish commands to the script
     cat > $TEMP_SCRIPT << EOF
     #!/usr/bin/env fish
@@ -28,10 +28,10 @@ let
     source $FUNCTIONS_DIR/yay.fish
     yay_function $@
     EOF
-    
+
     # Execute the script
     ${lib.getExe pkgs.fish} $TEMP_SCRIPT "$@"
-    
+
     # Clean up
     rm $TEMP_SCRIPT
   '';
