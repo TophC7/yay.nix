@@ -4,7 +4,7 @@ function __yay_rebuild
     if set -q _flag_help
         echo "Usage: yay rebuild [OPTIONS]"
         echo "  -h, --help          Show this help message"
-        echo "  -e, --experimental  Enable experimental features (flakes and nix-commands)"
+        echo "  -e, --experimental  Enable experimental features (flakes and nix-command)"
         echo "  -H, --host HOST     Hostname to build for (default: current hostname)"
         echo "  -p, --path PATH     Path to the Nix configuration (overrides FLAKE)"
         echo "  -t, --trace         Enable trace output"
@@ -31,7 +31,7 @@ function __yay_rebuild
 
     # Add experimental features if requested
     if set -q _flag_experimental
-        set cmd "$cmd --extra-experimental-features flakes --extra-experimental-features nix-commands"
+        set cmd "$cmd --extra-experimental-features flakes --extra-experimental-features nix-command"
     end
 
     # Run the command
