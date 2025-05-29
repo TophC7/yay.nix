@@ -7,7 +7,7 @@ function __ensure_yay_functions
             (dirname (dirname (status -f)))/functions \
             /run/current-system/sw/share/yay.nix/functions \
             $__fish_config_dir/functions
-            
+
         for dir in $possible_paths
             if test -f "$dir/__yay_get_flake_path.fish"
                 source "$dir/__yay_get_flake_path.fish"
@@ -84,11 +84,11 @@ end
 # Flake input handling
 function __yay_list_flake_inputs
     set -l flake_path (__yay_get_flake_path $argv[1]); or return
-    
+
     if not test -f "$flake_path/flake.lock"
         return 1
     end
-    
+
     # Extract input names from the flake.lock file using jq
     jq -r '.nodes.root.inputs | keys[]' "$flake_path/flake.lock" 2>/dev/null
 end
@@ -96,23 +96,23 @@ end
 function __yay_get_flake_inputs
     # Ensure required functions are available
     __ensure_yay_functions
-    
+
     # Skip if the required function isn't available
     if not type -q __yay_get_flake_path
         return 1
     end
-    
+
     set -l cmd (commandline -poc)
     set -l path ""
-    
+
     # Check for --path or -p option
     for i in (seq 1 (count $cmd))
-        if test "$cmd[$i]" = "--path" -o "$cmd[$i]" = "-p"; and test (count $cmd) -ge (math $i + 1)
+        if test "$cmd[$i]" = --path -o "$cmd[$i]" = -p; and test (count $cmd) -ge (math $i + 1)
             set path $cmd[(math $i + 1)]
             break
         end
     end
-    
+
     __yay_list_flake_inputs $path
 end
 
@@ -155,12 +155,13 @@ end
 complete -c yay -f
 
 # Complete the top-level subcommands
-complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar" -a rebuild -d "Rebuild the NixOS configuration"
-complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar" -a update -d "Update flake inputs"
-complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar" -a garbage -d "Clean up the Nix store"
-complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar" -a try -d "Create a shell with the specified package(s)"
-complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar" -a tar -d "Create compressed tar archives"
-complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar" -a untar -d "Extract tar archives"
+complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a garbage -d "Clean up the Nix store"
+complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a rebuild -d "Rebuild the NixOS configuration"
+complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a serve -d "Start a file server"
+complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a tar -d "Create compressed tar archives"
+complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a try -d "Create a shell with the specified package(s)"
+complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a untar -d "Extract tar archives"
+complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a update -d "Update flake inputs"
 
 ######################
 # REBUILD SUBCOMMAND #
@@ -192,6 +193,15 @@ complete -c yay -n "__yay_seen_subcommand_from update; and not __yay_seen_option
 complete -c yay -n "__yay_seen_subcommand_from garbage" -s h -l help -d "Show help message"
 
 ######################
+# SERVE SUBCOMMAND   #
+######################
+
+# Options for 'serve'
+complete -c yay -n "__yay_seen_subcommand_from serve" -s p -l port -r -d "Port to serve on (default: 8080)"
+complete -c yay -n "__yay_seen_subcommand_from serve" -s d -l directory -r -a "(__fish_complete_directories)" -d "Directory to serve (default: current directory)"
+complete -c yay -n "__yay_seen_subcommand_from serve" -s h -l help -d "Show help message"
+
+######################
 # TRY SUBCOMMAND     #
 ######################
 
@@ -204,7 +214,7 @@ function __yay_try_no_dash_dash_yet
     and not contains -- -- (commandline -poc)
     and not string match -r -- '^-' (commandline -ct)
 end
-complete -c yay -n "__yay_try_no_dash_dash_yet" -a "(__yay_list_packages)" -d "Nix package"
+complete -c yay -n __yay_try_no_dash_dash_yet -a "(__yay_list_packages)" -d "Nix package"
 
 # Double dash separator completion for try
 function __yay_try_can_add_dash_dash
@@ -212,7 +222,7 @@ function __yay_try_can_add_dash_dash
     and not contains -- -- (commandline -poc)
     and test (count (commandline -poc)) -gt 2
 end
-complete -c yay -n "__yay_try_can_add_dash_dash" -a "--" -d "Separator for command to run"
+complete -c yay -n __yay_try_can_add_dash_dash -a -- -d "Separator for command to run"
 
 # Command completion after --
 function __yay_try_after_dash_dash
@@ -220,7 +230,7 @@ function __yay_try_after_dash_dash
     contains -- -- $tokens
     and __yay_seen_subcommand_from try
 end
-complete -c yay -n "__yay_try_after_dash_dash" -a "(__fish_complete_command)" -d "Command to run"
+complete -c yay -n __yay_try_after_dash_dash -a "(__fish_complete_command)" -d "Command to run"
 
 ######################
 # TAR SUBCOMMAND     #

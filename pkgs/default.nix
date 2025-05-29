@@ -14,6 +14,14 @@ let
     cp ${../share/fish/completions}/yay.fish $out/share/fish/vendor_completions.d/
   '';
 
+  # Build the Go file server
+  yay-serve = pkgs.buildGoModule {
+    pname = "yay-serve";
+    version = "1.0.0";
+    src = ../share/serve;
+    vendorHash = null;
+  };
+
   # Create main yay binary that correctly passes args to fish
   yayBin = pkgs.writeShellScriptBin "yay" ''
     FUNCTIONS_DIR=$(dirname $(dirname $0))/share/fish/functions
@@ -42,6 +50,7 @@ pkgs.symlinkJoin {
     yayBin
     fishFunctions
     fishCompletions
+    yay-serve
   ];
   buildInputs = [ pkgs.makeWrapper ];
 
@@ -59,6 +68,7 @@ pkgs.symlinkJoin {
           pkgs.bzip2
           pkgs.bzip3
           pkgs.zstd
+          yay-serve
         ]
       }
   '';

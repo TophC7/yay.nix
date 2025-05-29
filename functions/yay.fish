@@ -22,6 +22,8 @@ function yay_function
             __yay_tar $argv[2..-1]; or exit $status
         case untar
             __yay_untar $argv[2..-1]; or exit $status
+        case serve
+            __yay_serve $argv[2..-1]; or exit $status
         case '*'
             __yay_red "Unknown subcommand: $argv[1]"
             exit 1
