@@ -59,6 +59,7 @@ pkgs.symlinkJoin {
     wrapProgram $out/bin/yay \
       --prefix PATH : ${
         lib.makeBinPath [
+          pkgs.bash
           pkgs.fish
           pkgs.nh
           pkgs.jq
