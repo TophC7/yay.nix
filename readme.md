@@ -48,10 +48,10 @@ Add to your flake.nix:
 ### Try in shell
 
 ```bash
-#create shell with yay
-nix shell github:Tophc7/yay.nix
+# Create shell with yay
+nix shell github:Tophc7/yay.nix --extra-experimental-features flakes --extra-experimental-features nix-command --no-write-lock-file
 
-## run any yay command
+# Run any yay command
 yay try fastfetch -- fastfetch --config examples/24
 yay garbage
 ```
@@ -71,6 +71,7 @@ Options:
 - `-p, --path PATH`: Path to the Nix configuration (overrides FLAKE env var)
 - `-H, --host HOST`: Hostname to build for (default: current hostname)
 - `-t, --trace`: Enable trace output
+- `-e, --experimental`: Enable experimental features (flakes and nix-command)
 - `-h, --help`: Show help message
 
 ### update
@@ -150,12 +151,12 @@ Options:
 - `-h, --help`: Show help message
 
 Supported compression types:
-- `7zip`:   .7z (levels: 0-9, default 5)
+- `7zip`:   .7z (levels: 0-9, default 5, threads: yes)
 - `bzip2`:  .tar.bz2 (levels: 1-9, default 9)
-- `bzip3`:  .tar.bz3 (block size in MiB: 1-511, default 16)
+- `bzip3`:  .tar.bz3 (block size in MiB: 1-511, default 16, threads: yes)
 - `gzip`:   .tar.gz (levels: 1-9, default 6)
 - `tar`:    .tar (no compression)
-- `zstd`:   .tar.zst (levels: 1-19, default 3)
+- `zstd`:   .tar.zst (levels: 1-19, default 3, threads: yes)
 
 ### untar
 
@@ -179,9 +180,31 @@ Supported archive formats (auto-detected from extension):
 - `.tar` (uncompressed tar)
 - `.tar.zst`, `.tzst` (zstd)
 
+### serve
+
+Start a file server to serve files from a directory.
+
+```bash
+yay serve [OPTIONS]
+```
+
+Options:
+- `-p, --port PORT`: Port to serve on (default: 8080)
+- `-d, --directory DIR`: Directory to serve (default: current directory)
+- `-h, --help`: Show help message
+
+Examples:
+```bash
+# Serve current directory on port 8080
+yay serve
+
+# Serve a specific directory on custom port
+yay serve -d /path/to/files -p 3000
+```
+
 ### more?
 
-If theres a command you think would be useful to add let me know, I might agree.
+If there's a command you think would be useful to add let me know, I might agree.
 
 ## Technical Details
 
