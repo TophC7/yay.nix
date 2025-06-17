@@ -21,21 +21,23 @@ function __yay_rebuild
     set orig (pwd)
     cd $flake_path
 
-    # Base command
-    set -l cmd "nh os switch . -H $host -- --impure"
-
+    # Build the nh command
+    set -l nh_cmd "nh os switch . -H $host -- --impure"
+    
     # Add trace if requested
     if set -q _flag_trace
-        set cmd "$cmd --show-trace"
+        set nh_cmd "$nh_cmd --show-trace"
     end
 
-    # Add experimental features if requested
+    # Choose execution method based on experimental flag
     if set -q _flag_experimental
-        set cmd "$cmd --extra-experimental-features flakes --extra-experimental-features nix-command"
+        # Run nh inside a shell with experimental features
+        set -l shell_cmd "nix shell nixpkgs#nh --extra-experimental-features \"nix-command flakes\" -c fish -c \"$nh_cmd\""
+        __yay_run $shell_cmd
+    else
+        # Run nh directly
+        __yay_run $nh_cmd
     end
-
-    # Run the command
-    __yay_run $cmd
 
     cd $orig
 end
