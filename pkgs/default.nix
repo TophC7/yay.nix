@@ -11,7 +11,8 @@ let
   # Copy completions
   fishCompletions = pkgs.runCommand "yay-fish-completions" { } ''
     mkdir -p $out/share/fish/vendor_completions.d
-    cp ${../share/fish/completions}/yay.fish $out/share/fish/vendor_completions.d/
+    cp ${import ../share/fish/completions.nix { inherit pkgs lib; }} $out/share/fish/vendor_completions.d/yay.fish
+    chmod +r $out/share/fish/vendor_completions.d/yay.fish
   '';
 
   # Build the Go file server
