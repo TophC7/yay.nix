@@ -19,13 +19,14 @@ function __yay_try
     end
 
     # Now parse only the arguments before --
-    set -l opts h/help e/experimental
+    set -l opts h/help e/experimental u/unfree
     argparse $opts -- $args_before_sep; or return
 
     if set -q _flag_help; or test (count $args_before_sep) -eq 0 -a (count $cmd_after_sep) -eq 0
         echo "Usage: yay try [OPTIONS] PACKAGE [PACKAGE...] [-- COMMAND [ARGS...]]"
         echo "  -e, --experimental  Enable experimental features (nix-command flakes)"
-        echo "  -h, --help         Show this help message"
+        echo "  -u, --unfree        Allow unfree packages"
+        echo "  -h, --help          Show this help message"
         return
     end
 
@@ -51,10 +52,19 @@ function __yay_try
     __yay_yellow "Loading packages: $pkgs"
 
     # Build the base command
-    set -l base_cmd "nix shell"
+    set -l base_cmd
+    if set -q _flag_unfree
+        set base_cmd "set -x NIXPKGS_ALLOW_UNFREE 1; nix shell"
+    else
+        set base_cmd "nix shell"
+    end
     
     if set -q _flag_experimental
         set base_cmd "$base_cmd --extra-experimental-features \"nix-command flakes\""
+    end
+
+    if set -q _flag_unfree
+        set base_cmd "$base_cmd --impure"
     end
 
     # Convert package names to nixpkgs# format

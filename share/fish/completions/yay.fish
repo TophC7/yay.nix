@@ -135,7 +135,7 @@ function __yay_list_packages
     # Process packages to remove namespace prefix (like "nixos.", "nixpkgs.", etc.)
     set -l cleaned_packages
     for pkg in $packages
-        set -l cleaned_pkg (string replace -r '^[^.]+\.' ''\'''\' $pkg)
+        set -l cleaned_pkg (string replace -r '^[^.]+\.' '' $pkg)
         set -a cleaned_packages $cleaned_pkg
     end
 
@@ -145,6 +145,51 @@ function __yay_list_packages
 
     # Output the packages
     printf "%s\n" $cleaned_packages
+end
+
+# Helper functions for try completion
+function __yay_try_no_dash_dash_yet
+    __yay_seen_subcommand_from try
+    and not contains -- -- (commandline -poc)
+    and not string match -r -- '^-' (commandline -ct)
+end
+
+function __yay_try_can_add_dash_dash
+    __yay_seen_subcommand_from try
+    and not contains -- -- (commandline -poc)
+    and test (count (commandline -poc)) -gt 2
+end
+
+function __yay_try_after_dash_dash
+    set -l tokens (commandline -poc)
+    contains -- -- $tokens
+    and __yay_seen_subcommand_from try
+end
+
+# Helper functions for tar completion
+function __yay_tar_needs_input
+    __yay_seen_subcommand_from tar
+    and count (commandline -poc) = 2
+    and not __yay_seen_option -o --output -c --compression -l --level -t --threads -v --verbose -h --help
+end
+
+function __yay_tar_needs_output
+    __yay_seen_subcommand_from tar
+    and count (commandline -poc) = 3
+    and not __yay_seen_option -o --output
+end
+
+# Helper functions for untar completion
+function __yay_untar_needs_input
+    __yay_seen_subcommand_from untar
+    and count (commandline -poc) = 2
+    and not __yay_seen_option -o --output -v --verbose -h --help
+end
+
+function __yay_untar_needs_output
+    __yay_seen_subcommand_from untar
+    and count (commandline -poc) = 3
+    and not __yay_seen_option -o --output
 end
 
 ######################
@@ -171,6 +216,7 @@ complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try ta
 complete -c yay -n "__yay_seen_subcommand_from rebuild" -s p -l path -r -d "Path to the Nix configuration"
 complete -c yay -n "__yay_seen_subcommand_from rebuild" -s H -l host -r -d "Hostname to build for"
 complete -c yay -n "__yay_seen_subcommand_from rebuild" -s t -l trace -d "Enable trace output"
+complete -c yay -n "__yay_seen_subcommand_from rebuild" -s e -l experimental -d "Enable experimental features (nix-command flakes)"
 complete -c yay -n "__yay_seen_subcommand_from rebuild" -s h -l help -d "Show help message"
 
 ######################
@@ -206,30 +252,17 @@ complete -c yay -n "__yay_seen_subcommand_from serve" -s h -l help -d "Show help
 ######################
 
 # Options for 'try'
+complete -c yay -n "__yay_seen_subcommand_from try" -s e -l experimental -d "Enable experimental features (nix-command flakes)"
+complete -c yay -n "__yay_seen_subcommand_from try" -s u -l unfree -d "Allow unfree packages"
 complete -c yay -n "__yay_seen_subcommand_from try" -s h -l help -d "Show help message"
 
 # Package completion for try (before --)
-function __yay_try_no_dash_dash_yet
-    __yay_seen_subcommand_from try
-    and not contains -- -- (commandline -poc)
-    and not string match -r -- '^-' (commandline -ct)
-end
 complete -c yay -n __yay_try_no_dash_dash_yet -a "(__yay_list_packages)" -d "Nix package"
 
 # Double dash separator completion for try
-function __yay_try_can_add_dash_dash
-    __yay_seen_subcommand_from try
-    and not contains -- -- (commandline -poc)
-    and test (count (commandline -poc)) -gt 2
-end
 complete -c yay -n __yay_try_can_add_dash_dash -a -- -d "Separator for command to run"
 
 # Command completion after --
-function __yay_try_after_dash_dash
-    set -l tokens (commandline -poc)
-    contains -- -- $tokens
-    and __yay_seen_subcommand_from try
-end
 complete -c yay -n __yay_try_after_dash_dash -a "(__fish_complete_command)" -d "Command to run"
 
 ######################
@@ -245,19 +278,9 @@ complete -c yay -n "__yay_seen_subcommand_from tar" -s v -l verbose -d "Enable v
 complete -c yay -n "__yay_seen_subcommand_from tar" -s h -l help -d "Show help message"
 
 # File path completion for tar input
-function __yay_tar_needs_input
-    __yay_seen_subcommand_from tar
-    and count (commandline -poc) = 2
-    and not __yay_seen_option -o --output -c --compression -l --level -t --threads -v --verbose -h --help
-end
 complete -c yay -n __yay_tar_needs_input -r -d "Input path"
 
 # File path completion for tar output
-function __yay_tar_needs_output
-    __yay_seen_subcommand_from tar
-    and count (commandline -poc) = 3
-    and not __yay_seen_option -o --output
-end
 complete -c yay -n __yay_tar_needs_output -r -d "Output file"
 
 ######################
@@ -270,17 +293,7 @@ complete -c yay -n "__yay_seen_subcommand_from untar" -s v -l verbose -d "Enable
 complete -c yay -n "__yay_seen_subcommand_from untar" -s h -l help -d "Show help message"
 
 # File path completion for untar input with archive extensions
-function __yay_untar_needs_input
-    __yay_seen_subcommand_from untar
-    and count (commandline -poc) = 2
-    and not __yay_seen_option -o --output -v --verbose -h --help
-end
 complete -c yay -n __yay_untar_needs_input -r -a "*.tar *.tar.gz *.tgz *.tar.zst *.tzst *.tar.bz2 *.tbz *.tbz2 *.tb2 *.tz2 *.tar.bz3 *.7z *.tar.7z *.rar" -d "Archive file"
 
 # Directory completion for untar output directory
-function __yay_untar_needs_output
-    __yay_seen_subcommand_from untar
-    and count (commandline -poc) = 3
-    and not __yay_seen_option -o --output
-end
 complete -c yay -n __yay_untar_needs_output -r -a "(__fish_complete_directories)" -d "Output directory"
