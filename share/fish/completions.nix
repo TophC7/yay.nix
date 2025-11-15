@@ -206,13 +206,15 @@
   complete -c yay -f
 
   # Complete the top-level subcommands
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a garbage -d "Clean up the Nix store"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a rebuild -d "Rebuild the NixOS configuration"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a serve -d "Start a file server"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a tar -d "Create compressed tar archives"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a try -d "Create a shell with the specified package(s)"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a untar -d "Extract tar archives"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve" -a update -d "Update flake inputs"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a find -d "Find packages and files in the Nix store"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a garbage -d "Clean up the Nix store"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a inspect -d "Introspect a flake's packages and options"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a rebuild -d "Rebuild the NixOS configuration"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a serve -d "Start a file server"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a tar -d "Create compressed tar archives"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a try -d "Create a shell with the specified package(s)"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a untar -d "Extract tar archives"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a update -d "Update flake inputs"
 
   ######################
   # REBUILD SUBCOMMAND #
@@ -303,4 +305,32 @@
 
   # Directory completion for untar output directory
   complete -c yay -n __yay_untar_needs_output -r -a "(__fish_complete_directories)" -d "Output directory"
+
+  ######################
+  # INSPECT SUBCOMMAND #
+  ######################
+
+  # Options for 'inspect'
+  complete -c yay -n "__yay_seen_subcommand_from inspect" -s e -l experimental -d "Enable experimental features (nix-command flakes)"
+  complete -c yay -n "__yay_seen_subcommand_from inspect" -s p -l packages -d "Show only packages"
+  complete -c yay -n "__yay_seen_subcommand_from inspect" -s o -l options -d "Show only NixOS/Home Manager options"
+  complete -c yay -n "__yay_seen_subcommand_from inspect" -s s -l system -r -a "x86_64-linux aarch64-linux x86_64-darwin aarch64-darwin" -d "Specify system"
+  complete -c yay -n "__yay_seen_subcommand_from inspect" -s h -l help -d "Show help message"
+
+  # Flake reference completion for inspect (accepts github:, paths, etc.)
+  complete -c yay -n "__yay_seen_subcommand_from inspect; and not __yay_seen_option -h --help; and test (count (commandline -poc)) -eq 2" -r -d "Flake reference (e.g., github:user/repo, ., ./path)"
+
+  ######################
+  # FIND SUBCOMMAND    #
+  ######################
+
+  # Options for 'find'
+  complete -c yay -n "__yay_seen_subcommand_from find" -s o -l owner -r -d "Find which package owns a file path"
+  complete -c yay -n "__yay_seen_subcommand_from find" -s a -l all -d "Search entire store (default: current generation only)"
+  complete -c yay -n "__yay_seen_subcommand_from find" -s e -l experimental -d "Enable experimental features (nix-command flakes)"
+  complete -c yay -n "__yay_seen_subcommand_from find" -s h -l help -d "Show help message"
+
+  # Pattern/file path completion for find
+  complete -c yay -n "__yay_seen_subcommand_from find; and __yay_seen_option -o --owner" -r -d "File path"
+  complete -c yay -n "__yay_seen_subcommand_from find; and not __yay_seen_option -h --help -o --owner; and test (count (commandline -poc)) -eq 2" -d "Search pattern"
 ''

@@ -5,7 +5,7 @@ function yay_function
     if test (count $argv) -eq 0
         echo "yay! :D"
         echo "Usage: yay <command> [args]"
-        echo "Commands: rebuild, update, garbage, try, tar, untar"
+        echo "Commands: rebuild, update, garbage, try, tar, untar, inspect, find"
         exit 1
     end
 
@@ -24,6 +24,10 @@ function yay_function
             __yay_untar $argv[2..-1]; or exit $status
         case serve
             __yay_serve $argv[2..-1]; or exit $status
+        case inspect
+            __yay_inspect $argv[2..-1]; or exit $status
+        case find
+            __yay_find $argv[2..-1]; or exit $status
         case '*'
             __yay_red "Unknown subcommand: $argv[1]"
             exit 1
