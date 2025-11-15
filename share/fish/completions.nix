@@ -206,15 +206,16 @@
   complete -c yay -f
 
   # Complete the top-level subcommands
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a find -d "Find packages and files in the Nix store"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a garbage -d "Clean up the Nix store"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a inspect -d "Introspect a flake's packages and options"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a rebuild -d "Rebuild the NixOS configuration"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a serve -d "Start a file server"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a tar -d "Create compressed tar archives"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a try -d "Create a shell with the specified package(s)"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a untar -d "Extract tar archives"
-  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find" -a update -d "Update flake inputs"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a build -d "Build packages into the Nix store"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a find -d "Find packages and files in the Nix store"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a garbage -d "Clean up the Nix store"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a inspect -d "Introspect a flake's packages and options"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a rebuild -d "Rebuild the NixOS configuration"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a serve -d "Start a file server"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a tar -d "Create compressed tar archives"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a try -d "Create a shell with the specified package(s)"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a untar -d "Extract tar archives"
+  complete -c yay -n "not __yay_seen_subcommand_from rebuild update garbage try tar untar serve inspect find build" -a update -d "Update flake inputs"
 
   ######################
   # REBUILD SUBCOMMAND #
@@ -333,4 +334,16 @@
   # Pattern/file path completion for find
   complete -c yay -n "__yay_seen_subcommand_from find; and __yay_seen_option -o --owner" -r -d "File path"
   complete -c yay -n "__yay_seen_subcommand_from find; and not __yay_seen_option -h --help -o --owner; and test (count (commandline -poc)) -eq 2" -d "Search pattern"
+
+  ######################
+  # BUILD SUBCOMMAND   #
+  ######################
+
+  # Options for 'build'
+  complete -c yay -n "__yay_seen_subcommand_from build" -s p -l path -d "Show full store paths of built packages"
+  complete -c yay -n "__yay_seen_subcommand_from build" -s e -l experimental -d "Enable experimental features (nix-command flakes)"
+  complete -c yay -n "__yay_seen_subcommand_from build" -s h -l help -d "Show help message"
+
+  # Package completion for build (can add multiple packages)
+  complete -c yay -n "__yay_seen_subcommand_from build; and not __yay_seen_option -h --help" -a "(__yay_list_packages)" -d "Package to build"
 ''
