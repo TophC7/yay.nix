@@ -122,37 +122,6 @@
     __yay_list_flake_inputs $path
   end
 
-  # Package listing with caching
-  function __yay_list_packages
-    # Use persistent cache file in /tmp (lasts until reboot)
-    set -l cache_file /tmp/yay_packages_cache
-
-    # Load from cache if it exists
-    if test -f "$cache_file"
-      cat "$cache_file"
-      return 0
-    end
-
-    # Otherwise, fetch packages and store in cache
-    echo -n "Loading packages..." >&2
-    # Run nix-env but redirect warnings to /dev/null
-    set -l packages (nix-env -qa --json 2>/dev/null | ${lib.getExe pkgs.jq} -r 'keys[]' 2>/dev/null)
-
-    # Process packages to remove namespace prefix (like "nixos.", "nixpkgs.", etc.)
-    set -l cleaned_packages
-    for pkg in $packages
-      set -l cleaned_pkg (string replace -r '^[^.]+\.' ''\'''\' $pkg)
-      set -a cleaned_packages $cleaned_pkg
-    end
-
-    # Save to cache file for future shell sessions
-    printf "%s\n" $cleaned_packages >"$cache_file"
-    echo " done!" >&2
-
-    # Output the packages
-    printf "%s\n" $cleaned_packages
-  end
-
   # Helper functions for try completion
   function __yay_try_no_dash_dash_yet
     __yay_seen_subcommand_from try
@@ -265,9 +234,6 @@
   complete -c yay -n "__yay_seen_subcommand_from try" -s u -l unfree -d "Allow unfree packages"
   complete -c yay -n "__yay_seen_subcommand_from try" -s h -l help -d "Show help message"
 
-  # Package completion for try (before --)
-  complete -c yay -n __yay_try_no_dash_dash_yet -a "(__yay_list_packages)" -d "Nix package"
-
   # Double dash separator completion for try
   complete -c yay -n __yay_try_can_add_dash_dash -a -- -d "Separator for command to run"
 
@@ -343,7 +309,4 @@
   complete -c yay -n "__yay_seen_subcommand_from build" -s p -l path -d "Show full store paths of built packages"
   complete -c yay -n "__yay_seen_subcommand_from build" -s e -l experimental -d "Enable experimental features (nix-command flakes)"
   complete -c yay -n "__yay_seen_subcommand_from build" -s h -l help -d "Show help message"
-
-  # Package completion for build (can add multiple packages)
-  complete -c yay -n "__yay_seen_subcommand_from build; and not __yay_seen_option -h --help" -a "(__yay_list_packages)" -d "Package to build"
 ''

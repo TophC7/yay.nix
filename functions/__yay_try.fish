@@ -1,18 +1,18 @@
 function __yay_try
     set -l all_args $argv
-    
+
     # Find -- separator before argparse to avoid argparse consuming it
     set -l sep_index (contains --index -- '--' $all_args)
     set -l args_before_sep $all_args
     set -l cmd_after_sep
-    
-    if test $status -eq 0  # Found '--' separator
+
+    if test $status -eq 0 # Found '--' separator
         if test $sep_index -gt 1
             set args_before_sep $all_args[1..(math $sep_index - 1)]
         else
             set args_before_sep # empty if -- is first
         end
-        
+
         if test $sep_index -lt (count $all_args)
             set cmd_after_sep $all_args[(math $sep_index + 1)..-1]
         end
@@ -24,15 +24,26 @@ function __yay_try
 
     if set -q _flag_help; or test (count $args_before_sep) -eq 0 -a (count $cmd_after_sep) -eq 0
         echo "Usage: yay try [OPTIONS] PACKAGE [PACKAGE...] [-- COMMAND [ARGS...]]"
+        echo ""
+        echo "Create a temporary shell with specified packages"
+        echo ""
+        echo "Options:"
         echo "  -e, --experimental  Enable experimental features (nix-command flakes)"
         echo "  -u, --unfree        Allow unfree packages"
         echo "  -h, --help          Show this help message"
+        echo ""
+        echo "Examples:"
+        echo "  yay try firefox                      # Auto-prefixes to nixpkgs#firefox"
+        echo "  yay try github:user/repo#package     # Use explicit flake reference"
+        echo "  yay try .#mypackage                  # Try package from local flake"
+        echo "  yay try cowsay -- cowsay moo         # Run command in shell with package"
+        echo ""
         return
     end
 
     # $argv now contains only the packages (after argparse removed flags)
     set -l pkgs $argv
-    
+
     # Build command string from cmd_after_sep
     set -l cmd_str
     if test (count $cmd_after_sep) -gt 0
@@ -58,7 +69,7 @@ function __yay_try
     else
         set base_cmd "nix shell"
     end
-    
+
     if set -q _flag_experimental
         set base_cmd "$base_cmd --extra-experimental-features \"nix-command flakes\""
     end
@@ -67,10 +78,16 @@ function __yay_try
         set base_cmd "$base_cmd --impure"
     end
 
-    # Convert package names to nixpkgs# format
+    # Convert package names to flake references (auto-prefix nixpkgs# if needed)
     set -l nix_pkgs
     for pkg in $pkgs
-        set nix_pkgs $nix_pkgs "nixpkgs#$pkg"
+        # If package already contains #, use as-is (explicit flake reference)
+        if string match -q '*#*' "$pkg"
+            set nix_pkgs $nix_pkgs "$pkg"
+        else
+            # Otherwise, prefix with nixpkgs#
+            set nix_pkgs $nix_pkgs "nixpkgs#$pkg"
+        end
     end
     set -l pkg_str (string join ' ' -- $nix_pkgs)
 
