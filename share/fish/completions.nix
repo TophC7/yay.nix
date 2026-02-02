@@ -311,8 +311,10 @@
   ######################
 
   # Options for 'build'
-  complete -c yay -n "__yay_seen_subcommand_from build" -s p -l path -d "Show full store paths of built packages"
+  complete -c yay -n "__yay_seen_subcommand_from build" -s h -l help -d "Show help message"
+  complete -c yay -n "__yay_seen_subcommand_from build" -s s -l show-paths -d "Show full store paths of built packages"
+  complete -c yay -n "__yay_seen_subcommand_from build" -s B -l build-host -r -d "Build on this host instead of locally"
+  complete -c yay -n "__yay_seen_subcommand_from build" -s l -l local -d "Force local build (bypass default build host)"
   complete -c yay -n "__yay_seen_subcommand_from build" -s c -l copy -r -d "Copy built packages to binary cache (ssh://host, s3://bucket, file:///path)"
   complete -c yay -n "__yay_seen_subcommand_from build" -s e -l experimental -d "Enable experimental features (nix-command flakes)"
-  complete -c yay -n "__yay_seen_subcommand_from build" -s h -l help -d "Show help message"
 ''
