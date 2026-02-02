@@ -192,12 +192,15 @@
 
   # Options for 'rebuild'
   complete -c yay -n "__yay_seen_subcommand_from rebuild" -s p -l path -r -d "Path to the Nix configuration"
-  complete -c yay -n "__yay_seen_subcommand_from rebuild" -s H -l host -r -d "Hostname to build for"
+  complete -c yay -n "__yay_seen_subcommand_from rebuild" -s H -l host -r -d "Target host to build for"
+  complete -c yay -n "__yay_seen_subcommand_from rebuild" -s B -l build-host -r -d "Build on this host instead of locally"
+  complete -c yay -n "__yay_seen_subcommand_from rebuild" -s l -l local -d "Force local build (bypass default build host)"
   complete -c yay -n "__yay_seen_subcommand_from rebuild" -s t -l trace -d "Enable trace output"
   complete -c yay -n "__yay_seen_subcommand_from rebuild" -s s -l substituter -r -d "Extra binary cache URL"
   complete -c yay -n "__yay_seen_subcommand_from rebuild" -s k -l key -r -d "Trusted public key for cache"
-  complete -c yay -n "__yay_seen_subcommand_from rebuild" -s e -l experimental -d "Enable experimental features (nix-command flakes)"
   complete -c yay -n "__yay_seen_subcommand_from rebuild" -s h -l help -d "Show help message"
+
+  # Note: --experimental removed - nh is now always in PATH via package wrapper
 
   ######################
   # UPDATE SUBCOMMAND  #

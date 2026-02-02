@@ -1,6 +1,18 @@
-{ pkgs, lib }:
+{
+  pkgs,
+  lib,
+  buildHost ? null,
+  flakePath ? null,
+}:
 
 let
+  # Create config file with baked-in defaults
+  yayConfig = pkgs.writeText "yay-config.fish" ''
+    # Baked-in configuration from Nix module
+    ${lib.optionalString (buildHost != null) "set -gx YAY_DEFAULT_BUILD_HOST ${lib.escapeShellArg buildHost}"}
+    ${lib.optionalString (flakePath != null) "set -gx YAY_DEFAULT_FLAKE_PATH ${lib.escapeShellArg flakePath}"}
+  '';
+
   # Create a derivation with all the fish functions
   fishFunctions = pkgs.runCommand "yay-fish-functions" { } ''
     mkdir -p $out/share/fish/functions
@@ -33,6 +45,8 @@ let
     # Write the fish commands to the script
     cat > $TEMP_SCRIPT << EOF
     #!/usr/bin/env fish
+    # Source baked-in configuration
+    source ${yayConfig}
     set fish_function_path \$fish_function_path $FUNCTIONS_DIR
     source $FUNCTIONS_DIR/yay.fish
     yay_function $@
@@ -70,6 +84,7 @@ pkgs.symlinkJoin {
           pkgs.bzip2
           pkgs.bzip3
           pkgs.zstd
+          pkgs.openssh
           yay-serve
         ]
       }

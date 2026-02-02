@@ -23,21 +23,28 @@
           default = yay;
           yay = import ./pkgs/default.nix { inherit pkgs lib; };
         };
+
+        # Helper function to build yay with custom config
+        lib.mkYay =
+          {
+            buildHost ? null,
+            flakePath ? null,
+          }:
+          import ./pkgs/default.nix {
+            inherit
+              pkgs
+              lib
+              buildHost
+              flakePath
+              ;
+          };
       }
     )
     // {
       # NixOS module for system-wide installation
-      nixosModules.default =
-        { pkgs, ... }:
-        {
-          environment.systemPackages = [ self.packages.${pkgs.system}.default ];
-        };
+      nixosModules.default = import ./modules/default.nix self;
 
-      # Home-manager module
-      homeManagerModules.default =
-        { pkgs, ... }:
-        {
-          home.packages = [ self.packages.${pkgs.system}.default ];
-        };
+      # Home Manager module
+      homeManagerModules.default = import ./modules/home.nix self;
     };
 }
