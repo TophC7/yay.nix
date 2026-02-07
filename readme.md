@@ -1,3 +1,5 @@
+> **‼️This project is archived‼️** Development has moved to [bonk](https://github.com/TophC7/bonk) — a Rust rewrite with more features, shell completions for Fish/Bash/Zsh, and remote build support.
+
 # Yay.nix
 
 Yay.nix (Yet another Yay) is a simple wrapper around useful commands I use all the time and can't be bothered to keep typing. I also just miss writing yay in terminal.
